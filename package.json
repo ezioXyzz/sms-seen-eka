@@ -1,0 +1,17 @@
+{
+  "name": "sri-lanka-sms-sender",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A secure Antryk-powered SMS sender with strict Sri Lankan mobile number validation.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "check": "node --check src/server.js && node --check src/validation.js"
+  },
+  "dependencies": {
+    "@antryk/sdk": "^1.0.0",
+    "dotenv": "^16.4.7"
+  }
+}

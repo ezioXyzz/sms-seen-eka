@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SignalDesk — Sri Lanka SMS</title>
+  <style>
+    :root { color-scheme: dark; --bg:#09111f; --panel:#101d31; --panel2:#142640; --text:#eef4ff; --muted:#9fb0c8; --line:#28415f; --accent:#62e6c2; --accent2:#80a8ff; --danger:#ff8f9f; }
+    * { box-sizing:border-box; } body { margin:0; min-height:100vh; font-family: Inter, ui-sans-serif, system-ui, sans-serif; color:var(--text); background: radial-gradient(circle at 15% 0%, #183459 0, transparent 32rem), var(--bg); }
+    main { width:min(1080px, 100%); margin:0 auto; padding:48px 24px; }
+    header { display:flex; justify-content:space-between; align-items:flex-start; gap:24px; margin-bottom:42px; }
+    .eyebrow { color:var(--accent); text-transform:uppercase; letter-spacing:.16em; font-size:12px; font-weight:800; } h1 { font-size:clamp(32px, 6vw, 66px); line-height:.98; max-width:650px; margin:12px 0 16px; letter-spacing:-.06em; } .lede { max-width:620px; color:var(--muted); font-size:17px; line-height:1.6; }
+    .badge { border:1px solid var(--line); border-radius:999px; padding:10px 14px; color:var(--muted); font-size:13px; white-space:nowrap; }
+    .shell { display:grid; grid-template-columns:1.25fr .75fr; gap:18px; } .card { background:linear-gradient(145deg, rgba(20,38,64,.96), rgba(12,25,43,.96)); border:1px solid var(--line); border-radius:24px; padding:28px; box-shadow:0 24px 80px #0003; } h2 { margin:0 0 22px; font-size:20px; }
+    label { display:block; margin:18px 0 8px; color:#dce7f6; font-size:14px; font-weight:700; } input, textarea { width:100%; border:1px solid #355474; border-radius:12px; padding:14px 15px; background:#0b1729; color:var(--text); font:inherit; outline:none; } input:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px #62e6c21f; } textarea { min-height:150px; resize:vertical; } .hint { color:var(--muted); font-size:12px; margin-top:7px; } .error { color:var(--danger); font-size:13px; min-height:18px; margin-top:7px; }
+    button { width:100%; border:0; border-radius:12px; padding:15px 18px; margin-top:22px; background:var(--accent); color:#082119; font:inherit; font-weight:900; cursor:pointer; } button:hover { filter:brightness(1.08); } button:disabled { opacity:.55; cursor:wait; }
+    .notice { padding:16px; border-radius:14px; background:#0c1829; border:1px solid #2b4566; color:var(--muted); line-height:1.5; font-size:14px; } .notice strong { color:var(--text); } .ok { color:var(--accent); } .result { margin-top:16px; min-height:24px; font-size:14px; } .facts { display:grid; gap:12px; margin-top:24px; } .fact { display:flex; gap:12px; align-items:flex-start; } .dot { width:8px; height:8px; border-radius:50%; background:var(--accent2); margin-top:7px; flex:0 0 auto; } .fact p { margin:0; color:var(--muted); line-height:1.5; font-size:14px; }
+    @media (max-width:760px) { main { padding:30px 16px; } header { display:block; } .badge { display:inline-block; margin-top:18px; } .shell { grid-template-columns:1fr; } .card { padding:22px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header><div><div class="eyebrow">SignalDesk / Sri Lanka</div><h1>Send a clear, branded message.</h1><p class="lede">A focused SMS console for operational messages to Sri Lankan mobile numbers, powered by your approved Antryk service.</p></div><div class="badge">Transactional SMS only</div></header>
+    <section class="shell">
+      <form class="card" id="sms-form"><h2>Compose message</h2>
+        <label for="senderId">Approved sender ID / company name</label><input id="senderId" name="senderId" autocomplete="organization" placeholder="e.g. ACME" required><div class="hint">This must exactly match the sender ID approved on your Antryk SMS service. It is not sent as an arbitrary per-message value.</div><div class="error" id="senderId-error"></div>
+        <label for="to">Recipient mobile number</label><input id="to" name="to" inputmode="tel" autocomplete="tel" placeholder="077 123 4567" required><div class="hint">Sri Lankan mobile numbers only: 0771234567 or +94771234567.</div><div class="error" id="to-error"></div>
+        <label for="message">Message</label><textarea id="message" name="message" maxlength="1600" placeholder="Write your operational message…" required></textarea><div class="hint"><span id="count">0</span>/1600 characters</div><div class="error" id="message-error"></div>
+        <button id="send" type="submit">Send SMS</button><div class="result" id="result" role="status" aria-live="polite"></div>
+      </form>
+      <aside class="card"><h2>Delivery guardrails</h2><div class="notice"><strong>Sender identity matters.</strong><br>Recipients see the sender identity configured and approved by the SMS provider. This console prevents using a different name in the request.</div><div class="facts"><div class="fact"><span class="dot"></span><p>Credentials stay on the server and never ship to the browser.</p></div><div class="fact"><span class="dot"></span><p>Phone numbers are normalized to international E.164 format before delivery.</p></div><div class="fact"><span class="dot"></span><p>Only Sri Lankan mobile prefixes beginning with 7 are accepted.</p></div><div class="fact"><span class="dot"></span><p>Messages are limited to Antryk’s documented 1,600-character maximum.</p></div></div></aside>
+    </section>
+  </main>
+  <script>
+    const form = document.querySelector('#sms-form'); const message = document.querySelector('#message'); const count = document.querySelector('#count'); const result = document.querySelector('#result'); const button = document.querySelector('#send');
+    message.addEventListener('input', () => count.textContent = message.value.length);
+    form.addEventListener('submit', async (event) => { event.preventDefault(); result.textContent = ''; result.className = 'result'; ['senderId','to','message'].forEach(k => document.querySelector('#'+k+'-error').textContent=''); button.disabled = true; button.textContent = 'Sending…';
+      try { const body = Object.fromEntries(new FormData(form)); const response = await fetch('/api/sms/send', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }); const data = await response.json(); if (!data.ok) { Object.entries(data.fields || {}).forEach(([key,value]) => { if (value) document.querySelector('#'+key+'-error').textContent = value; }); result.textContent = data.error || 'Message could not be sent.'; result.style.color = 'var(--danger)'; } else { result.textContent = `Accepted by Antryk for ${data.recipient}.`; result.style.color = 'var(--accent)'; form.reset(); count.textContent='0'; } } catch { result.textContent = 'Network error. Check that the server is running.'; result.style.color = 'var(--danger)'; } finally { button.disabled = false; button.textContent = 'Send SMS'; }
+    });
+  </script>
+</body>
+</html>
